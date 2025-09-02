@@ -82,7 +82,6 @@ const faqCategories = [
     },
 ];
 
-
 useHead({
     title: 'Q&A - Free Resume Builder | Frequently Asked Questions & Help',
     meta: [

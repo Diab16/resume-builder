@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia';
 import type {
     Certificate,
     Education,
@@ -15,7 +15,7 @@ import type {
     SocialLink,
     Volunteering,
 } from '~/types/resume';
-import {defaultResumeData} from '~/types/resume';
+import { defaultResumeData } from '~/types/resume';
 
 interface ResumeStoreState {
     resumes: Record<string, Resume>;
@@ -192,7 +192,7 @@ export const useResumeStore = defineStore('resume', {
             this.resumes[id] = {
                 id,
                 name: name || `Resume ${this.nextId}`,
-                data: {...defaultResumeData},
+                data: { ...defaultResumeData },
                 createdAt: timestamp,
                 updatedAt: timestamp,
             };

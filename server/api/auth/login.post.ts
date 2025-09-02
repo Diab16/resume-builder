@@ -2,7 +2,7 @@ import jwt from '@tsndr/cloudflare-worker-jwt';
 import bcrypt from 'bcryptjs';
 import type { D1Database } from '@cloudflare/workers-types';
 
-const JWT_SECRET = process.env.JWT_SECRET ;
+const JWT_SECRET = process.env.JWT_SECRET;
 interface User {
     id: string;
     email: string;

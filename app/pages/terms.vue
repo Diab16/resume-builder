@@ -98,7 +98,9 @@ useHead({
                 </p>
 
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
-                    <h3 class="text-lg font-semibold text-blue-900 mb-2">Open Source Community</h3>
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">
+                        Open Source Community
+                    </h3>
                     <p class="text-blue-800">
                         This project welcomes contributions from the community. If you're interested in contributing, reporting issues, or suggesting improvements, please visit our GitHub repository. Together, we can make this tool better for everyone.
                     </p>

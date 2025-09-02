@@ -120,7 +120,10 @@ useHead({
             </NuxtLink>
             <p class="text-xs text-gray-500 mt-4">
                 By using this website you agree to
-                <NuxtLink to="/terms" class="text-blue-600 hover:text-blue-800 underline">
+                <NuxtLink
+                    to="/terms"
+                    class="text-blue-600 hover:text-blue-800 underline"
+                >
                     terms and conditions
                 </NuxtLink>
             </p>

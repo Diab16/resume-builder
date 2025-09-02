@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useResumeStore } from '~/stores/resume';
-import { EyeIcon, FileText, Plus } from 'lucide-vue-next';
+import { EyeIcon, FileText } from 'lucide-vue-next';
 import { Button } from '~/components/ui/button';
 import ZoomControls from '~/components/elements/ZoomControls.vue';
 import ResumeBuilderHeader from '~/components/elements/ResumeBuilderHeader.vue';
@@ -15,6 +15,7 @@ import VolunteeringForm from '~/components/forms/VolunteeringForm.vue';
 import CertificatesForm from '~/components/forms/CertificatesForm.vue';
 import ResumePreview from '~/components/elements/ResumePreview.vue';
 import FirstTimeBuilderModal from '~/components/elements/FirstTimeBuilderModal.vue';
+import CloudSyncPromptModal from '~/components/elements/CloudSyncPromptModal.vue';
 import SyncIndicator from '~/components/elements/SyncIndicator.vue';
 
 useHead({
@@ -86,14 +87,28 @@ const authStore = useAuthStore();
 const { hasSeenModal, markModalSeen } = useModalSeen('firstTimeBuilder');
 const { startAutoSync, stopAutoSync, isSyncing, lastSyncSuccess, lastSyncTime, lastSyncError } = useAutoSync();
 useTypstLoader();
+
 onMounted(() => {
     settingsStore.initialize();
     resumeStore.initialize();
+
+    // Show first time modal for unauthenticated users
     if (!hasSeenModal() && !authStore.isAuthenticated && resumeStore.resumeCount > 0) {
         showFirstTimeModal.value = true;
     }
+
+    // Check if should show cloud sync modal for authenticated users
     if (authStore.isAuthenticated) {
         startAutoSync();
+
+        // Check if active resume is not synced to cloud and prompt hasn't been dismissed
+        const activeResume = resumeStore.activeResume;
+        if (activeResume && !activeResume.serverId) {
+            const { isDismissed } = useCloudSyncPrompt(activeResume.id);
+            if (!isDismissed()) {
+                showCloudSyncModal.value = true;
+            }
+        }
     }
 });
 watch(() => authStore.isAuthenticated, (isAuthenticated) => {
@@ -104,8 +119,22 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
         stopAutoSync();
     }
 });
+
+// Watch for active resume changes to check if we should show cloud sync modal
+watch(() => resumeStore.activeResumeId, (newResumeId) => {
+    if (newResumeId && authStore.isAuthenticated) {
+        const activeResume = resumeStore.activeResume;
+        if (activeResume && !activeResume.serverId) {
+            const { isDismissed } = useCloudSyncPrompt(activeResume.id);
+            if (!isDismissed()) {
+                showCloudSyncModal.value = true;
+            }
+        }
+    }
+});
 const showMobilePreview = ref(false);
 const showFirstTimeModal = ref(false);
+const showCloudSyncModal = ref(false);
 const zoomLevel = ref(1);
 const minZoom = 0.5;
 const maxZoom = 2.5;
@@ -150,6 +179,38 @@ const handleLogin = (dontShowAgain: boolean) => {
         markModalSeen();
     }
     navigateTo('/auth/login');
+};
+
+const handleCloudSyncModalClose = () => {
+    showCloudSyncModal.value = false;
+};
+
+const handleEnableSync = async (dontShowAgain: boolean) => {
+    showCloudSyncModal.value = false;
+
+    if (dontShowAgain && resumeStore.activeResumeId) {
+        const { dismissPrompt } = useCloudSyncPrompt(resumeStore.activeResumeId);
+        dismissPrompt();
+    }
+
+    // Sync the resume to the server (this will create it on the server if needed)
+    if (resumeStore.activeResumeId) {
+        try {
+            await resumeStore.syncResumeToServer(resumeStore.activeResumeId);
+        }
+        catch (error) {
+            console.error('Failed to enable cloud sync:', error);
+        }
+    }
+};
+
+const handleContinueWithoutSync = (dontShowAgain: boolean) => {
+    showCloudSyncModal.value = false;
+
+    if (dontShowAgain && resumeStore.activeResumeId) {
+        const { dismissPrompt } = useCloudSyncPrompt(resumeStore.activeResumeId);
+        dismissPrompt();
+    }
 };
 const sectionComponents = {
     experiences: ExperienceForm,
@@ -317,6 +378,12 @@ const orderedSections = computed(() => {
             @register="handleRegister"
             @login="handleLogin"
             @continue-locally="handleContinueLocally"
+        />
+        <CloudSyncPromptModal
+            :is-open="showCloudSyncModal"
+            @close="handleCloudSyncModalClose"
+            @enable-sync="handleEnableSync"
+            @continue-locally="handleContinueWithoutSync"
         />
     </ClientOnly>
 </template>
