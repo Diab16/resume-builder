@@ -21,24 +21,6 @@ const renderHeaderLeftColumn = (data: ResumeData, fontSize: number): string[] =>
     if (position) {
         rows.push(`#block(above: 0.8em)[#text(size: ${fontSize + 2}pt)[${position}]]`);
     }
-    return rows;
-};
-const renderHeaderRightColumn = (data: ResumeData, fontSize: number): string[] => {
-    const rows: string[] = [];
-    if (data?.email) {
-        const email = convertEmail(data.email);
-        rows.push(`#block(above: 0em)[#text(size: ${fontSize - 1}pt)[${email}]]`);
-    }
-    if (data?.phone) {
-        const phone = escapeTypstText(data.phone);
-        const phoneSpacing = rows.length > 0 ? '0.8em' : '0em';
-        rows.push(`#block(above: ${phoneSpacing})[#text(size: ${fontSize - 1}pt)[${phone}]]`);
-    }
-    if (data?.location) {
-        const location = escapeTypstText(data.location);
-        const locationSpacing = rows.length > 0 ? '0.8em' : '0em';
-        rows.push(`#block(above: ${locationSpacing})[#text(size: ${fontSize - 1}pt)[${location}]]`);
-    }
     const socialLinks = (data?.socialLinks || [])
         .filter(link => link.platform && link.url && link.url.trim() !== '')
         .map((link) => {
@@ -66,6 +48,25 @@ const renderHeaderRightColumn = (data: ResumeData, fontSize: number): string[] =
         const linksContent = socialLinks.join(' • ');
         rows.push(`#block(above: ${linksSpacing})[#text(size: ${fontSize - 1}pt)[${linksContent}]]`);
     }
+    return rows;
+};
+const renderHeaderRightColumn = (data: ResumeData, fontSize: number): string[] => {
+    const rows: string[] = [];
+    if (data?.email) {
+        const email = convertEmail(data.email);
+        rows.push(`#block(above: 0em)[#text(size: ${fontSize - 1}pt)[${email}]]`);
+    }
+    if (data?.phone) {
+        const phone = escapeTypstText(data.phone);
+        const phoneSpacing = rows.length > 0 ? '0.8em' : '0em';
+        rows.push(`#block(above: ${phoneSpacing})[#text(size: ${fontSize - 1}pt)[${phone}]]`);
+    }
+    if (data?.location) {
+        const location = escapeTypstText(data.location);
+        const locationSpacing = rows.length > 0 ? '0.8em' : '0em';
+        rows.push(`#block(above: ${locationSpacing})[#text(size: ${fontSize - 1}pt)[${location}]]`);
+    }
+
     return rows;
 };
 const convertResumeHeader = (data: ResumeData, fontSize: number) => {
