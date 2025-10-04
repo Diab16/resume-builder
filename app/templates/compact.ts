@@ -90,9 +90,14 @@ const convertResumeHeader = (data: ResumeData, fontSize: number) => {
     headerParts.push(')');
     headerParts.push('#block(above: 1em, below: 1em)[#line(length: 100%, stroke: 1pt + black)]');
     if (data?.summary) {
-        headerParts.push(`#block(above: 0em, below: ${SECTION_SPACING})[`
-            + `#text(size: ${fontSize}pt)[${escapeTypstText(data.summary)}]`
-            + ']');
+        const summaryContent = `#text(size: ${fontSize}pt)[${escapeTypstText(data.summary)}]`;
+        const summaryBlock = wrapInSectionBlock(
+            data.sectionHeaders?.summary || 'Summary',
+            summaryContent,
+            fontSize,
+            renderTemplateHeader,
+        );
+        headerParts.push(summaryBlock);
     }
     return headerParts.join('\n');
 };
