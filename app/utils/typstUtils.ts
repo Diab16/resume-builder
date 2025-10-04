@@ -21,7 +21,7 @@ export const convertExternalLinkIcon = (url: string): string => {
 };
 export const convertHeader = (title: string, size = '16pt'): string => {
     if (!title) return '';
-    return `#block(below: ${HEADER_SPACING}, above: 0em)[#text("${escapeTypstText(title)}", size: ${size}, weight: "bold")]`;
+    return `#block(below: ${HEADER_SPACING}, above: 0em)[#underline[#text("${escapeTypstText(title)}", size: ${size}, weight: "bold")]]`;
 };
 export const convertSubHeader = (title: string, size = '14pt'): string => {
     if (!title) return '';
